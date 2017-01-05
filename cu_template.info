@@ -1,0 +1,5 @@
+; $Id$
+name = "CU Web Template"
+description = "Displays the CU Identity banner, Primary links , Breadcrumbs and Page title blocks."
+core = 6.x
+php = 5.1

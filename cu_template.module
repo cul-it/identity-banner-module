@@ -1,0 +1,210 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Module for printing CU Identity banners, Primary links , Breadcrumbs and Page title blocks.
+ */
+
+
+
+/**
+ * Implementation of hook_block
+ */
+function cu_template_block($op='list' , $delta=0, $edit=array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0]['info'] = t('CU Banner (45px)');
+	  $blocks[1]['info'] = t('CU Banner (75px, search link)');
+	  $blocks[2]['info'] = t('CU Banner (75px, search form)');
+	  $blocks[3]['info'] = t('Breadcrumb');
+	  //$blocks[3]['region'] = 'Header';
+	  $blocks[4]['info'] = t('Page title');
+	  //$blocks[4]['region'] = 'Header';
+      //$blocks[3] = array('info' => t('Breadcrumb'), 'region' => 'Header');
+	  //$blocks[4] = array('info' => t('Page title'), 'region' => 'Header');
+	  return $blocks;
+    case 'view':
+		if ($delta == 0) {
+      		$blocks['content'] = variable_get('cu_banner_45px',  t(_cu_template_block_content($delta)));
+		} elseif($delta == 1) {
+			$blocks['content'] = variable_get('cu_banner_75px_link',  t(_cu_template_block_content($delta)));
+		} elseif($delta == 2) {
+			$blocks['content'] = variable_get('cu_banner_75px_form',  t(_cu_template_block_content($delta)));
+		} else {
+			$blocks['content'] = _cu_template_block_content($delta);
+		}
+      return $blocks;
+	case 'configure':
+      $form = array();
+      if ($delta == 0) {	  
+        // All we need to provide is a text field, Drupal will take care of
+        // the other block configuration options and the save button.
+        $form['cu_banner_45px'] = array(
+          '#type' => 'textarea',
+          '#title' => t('CU Banner (45px)'),
+          '#size' => 60,
+          '#description' => t('Edit HTML to modify default banner'),
+          '#default_value' => variable_get('cu_banner_45px',  t(_cu_template_block_content($delta))),
+        );
+      } elseif ($delta == 1) {	  
+        // All we need to provide is a text field, Drupal will take care of
+        // the other block configuration options and the save button.
+        $form['cu_banner_75px_link'] = array(
+          '#type' => 'textarea',
+          '#title' => t('CU Banner (75px, search link)'),
+          '#size' => 60,
+          '#description' => t('Edit HTML to modify default banner'),
+          '#default_value' => variable_get('cu_banner_75px_link',  t(_cu_template_block_content($delta))),
+        );
+      } elseif ($delta == 2) {	  
+        // All we need to provide is a text field, Drupal will take care of
+        // the other block configuration options and the save button.
+        $form['cu_banner_75px_form'] = array(
+          '#type' => 'textarea',
+          '#title' => t('CU Banner (75px, search form)'),
+          '#size' => 60,
+          '#description' => t('Edit HTML to modify default banner'),
+          '#default_value' => variable_get('cu_banner_75px_form',  t(_cu_template_block_content($delta))),
+        );
+      }
+      return $form;
+    case 'save':
+      // If $op is "save", we need to save settings from the configuration form.
+      // Since the first block is the only one that allows configuration, we
+      // need to check $delta to make sure we only save it.
+      if ($delta == 0) {
+        // Have Drupal save the string to the database.
+        variable_set('cu_banner_45px', $edit['cu_banner_45px']);
+      } elseif ($delta == 1) {
+        // Have Drupal save the string to the database.
+        variable_set('cu_banner_75px_link', $edit['cu_banner_75px_link']);
+      } elseif ($delta == 2) {
+        // Have Drupal save the string to the database.
+        variable_set('cu_banner_75px_form', $edit['cu_banner_75px_form']);
+      }
+      return;
+  }
+}
+
+
+
+
+
+/**
+ * Generate the contents of the CU Identity Banners, Page title block and Breadcrumbs block
+ */
+function _cu_template_block_content($delta) {
+	$contents = '';
+		
+	switch($delta) {
+	
+	
+		// 45 pixel banner
+		case 0:
+			$contents .= '<div id="cu-identity" class="forty-five-px">
+			<div id="cu-logo">
+				<a href="http://www.cornell.edu/"><img src="';
+			$contents .= base_path() . path_to_theme();
+			$contents .= '/images/cu_logo_unstyled.gif" alt="Cornell University" width="180" height="45" border="0" /></a>
+			</div>
+			<div id="cu-search">
+				<a href="http://www.cornell.edu/search/">Search Cornell</a>
+			</div>
+			</div>';
+	
+	
+			return $contents;
+		// 75 pixel banner, search links
+		case 1:
+			$contents .= '<div id="cu-identity" class="seventy-five-px">
+			<div id="cu-logo">
+				<a id="insignia-link" href="http://www.cornell.edu/"><img src="';
+				$contents .= base_path() . path_to_theme();
+				$contents .= '/images/unit_signature_unstyled.gif" alt="Cornell University" width="264" height="75" border="0" /></a>
+				<div id="unit-signature-links">
+					<a id="cornell-link" href="http://www.cornell.edu/">Cornell University</a>
+					<a id="unit-link" href="http://www.library.cornell.edu">Cornell University Library</a>
+				</div>
+			</div>
+			
+			<!-- 
+				The search-form div contains a form that allows the user to search 
+				either the unit website or all of cornell.edu directly from the banner.
+			-->
+			<div id="cu-identity-search-navigation">
+				<ul>
+					<li><a href="';
+			$contents .= base_path();
+			$contents .= '/search/node">Search this site</a></li>
+					<li><a href="http://www.cornell.edu/search/">Search Cornell</a></li>
+				</ul>
+			</div>
+			</div>';
+		
+			return $contents;
+			
+		// 75 pixel banner, search form
+		case 2:
+			$contents .= '<div id="cu-identity" class="seventy-five-px">
+			<div id="cu-logo">
+					<a id="insignia-link" href="http://www.cornell.edu/"><img src="';
+			$contents .= base_path() . path_to_theme();
+			$contents .= '/images/unit_signature_unstyled.gif" alt="Cornell University" width="264" height="75" border="0" /></a>
+					<div id="unit-signature-links">
+						<a id="cornell-link" href="http://www.cornell.edu/">Cornell University</a>
+						<a id="unit-link" href="http://www.library.cornell.edu">Cornell University Library</a>
+					</div>
+				</div>
+				
+				<!-- 
+					The search-form div contains a form that allows the user to search 
+					either the unit website or all of cornell.edu directly from the banner.
+				-->
+				<div id="cu-identity-search-form">
+					<form action="/search/cul_gsa" method="post" enctype="application/x-www-form-urlencoded">
+						<div id="cu-identity-search-input">
+							<label for="cu-identity-search-form-query">SEARCH:</label>
+							<input type="text" id="cu-identity-search-form-query" name="query" value="" size="20" />
+							<input type="submit" id="cu-identity-search-form-submit" name="submit" value="go" />
+						</div>
+			
+						<div id="cu-identity-search-filters">
+								<input type="radio" id="search-filters1" name="target" value="unit" checked="checked" />
+								<label for="search-filters1">Library pages</label>
+							
+								<input type="radio" id="search-filters2" name="target" value="cornell" />
+								<label for="search-filters2">Cornell</label>
+								
+								<a href="http://www.cornell.edu/search/">more options</a>
+						</div>	
+					</form>
+				</div>
+			</div>';
+		
+			return $contents;
+			
+		// Breadcrumbs
+		case 3:
+			$contents .= '<div id="breadcrumbs">';
+			$contents .= theme('breadcrumb', drupal_get_breadcrumb());
+			$contents .= '</div>
+				<hr class="hidden" />';
+	
+			return $contents;
+			
+		// Title bar
+		case 4:
+		
+			$contents .= '<div id="identity">';
+			$contents .= '<h1>' . drupal_get_title() . '</h1>';
+			$contents .= '</div>
+				<hr class="hidden" />';
+			
+			return $contents;
+	}
+
+	return;
+
+	
+}
